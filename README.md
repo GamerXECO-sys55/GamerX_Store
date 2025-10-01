@@ -1,10 +1,17 @@
-<h1 align="center">
-<img src="data/icons/hicolor/scalable/apps/io.github.gamerx.GamerXStore.svg" width="128" height="128" />
-<br/>
-GamerX Store
-</h1>
+<div align="center">
 
-<p align="center">Official Application Store for GamerX Linux</p>
+# 🎮 GamerX Store
+
+### *The Ultimate Application Store for GamerX Linux*
+
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![GTK4](https://img.shields.io/badge/GTK-4.0-brightgreen.svg)](https://gtk.org/)
+[![Flatpak](https://img.shields.io/badge/Flatpak-Ready-orange.svg)](https://flatpak.org/)
+[![Version](https://img.shields.io/badge/Version-0.5.3-informational.svg)](https://github.com/GamerXECO-sys55/GamerX_Store/releases)
+
+<img src="data/icons/hicolor/scalable/apps/io.github.gamerx.GamerXStore.svg" width="200" height="200" alt="GamerX Store Logo" />
+
+</div>
 
 <div align="center">
 <img height="512" alt="Image" src="https://github.com/user-attachments/assets/6e2a3f5b-1a92-47ce-89b4-61864a452fd5" />
@@ -13,79 +20,93 @@ GamerX Store
 <img height="512" alt="Image" src="https://github.com/user-attachments/assets/0a149911-7edb-48c4-84e7-d4e64be80c0d" />
 </div>
 
-GamerX Store is the official application store for GamerX Linux with a focus on discovering and
-installing applications and add-ons from Flatpak remotes, particularly
-[Flathub](https://flathub.org/). Built on modern GTK4 technology with smooth animations and a beautiful interface, GamerX Store makes it simple to discover, install, and manage applications on your GamerX Linux system.
+## 🚀 **About**
 
-GamerX Store is fast and highly multi-threaded, guaranteeing a smooth
-experience in the user interface. You can queue as many downloads as 
-you wish and run them while perusing Flathub's latest releases. 
-This is due to the UI being completely decoupled from all backend operations.
+**GamerX Store** is the official application store for **GamerX Linux**, designed with gamers and power users in mind. Built on cutting-edge **GTK4** technology, it delivers a modern, smooth, and beautiful interface for discovering and installing applications from Flatpak repositories.
 
-{{ ... }}
-It runs as a service, meaning state will be maintained even if you
-close all windows, and implements the gnome-shell search provider dbus
-interface. A krunner
-[plugin](https://github.com/ublue-os/krunner-bazaar) is available for
-use on the KDE Plasma desktop.
+### ✨ **Features**
+- 🎯 **Modern UI/UX** - Sleek interface with smooth animations
+- ⚡ **Lightning Fast** - Highly multi-threaded architecture  
+- 🔄 **Queue Management** - Download multiple apps simultaneously
+- 🎮 **Gaming Focus** - Optimized for gaming applications
+- 🌙 **Dark Theme** - Beautiful dark theme with light option
+- 🔍 **Smart Search** - Integrated GNOME Shell search provider
 
-Based on Bazaar by Adam Masciola. Thanks to [Jakub Steiner](http://jimmac.eu) for designing the original
-icon.
+---
 
-The screenshot above showing the curated tab features
-[Aurora](https://getaurora.dev/en)'s
-[config](https://github.com/ublue-os/aurora/blob/9e66ef4f4624afa96fd6050f096c835ef0f81ad9/system_files/shared/usr/share/ublue-os/bazaar/config.yaml).
+## 🛠️ **Installation**
 
-### Installing
+```bash
+# Clone the repository
+git clone https://github.com/GamerXECO-sys55/GamerX_Store.git
+cd GamerX_Store/gamerx-store
 
-Pre-built binaries are distributed via Flathub and GitHub actions:
-
-<a href='https://flathub.org/apps/details/io.github.kolunmi.Bazaar'><img width='240' alt='Download on Flathub' src='https://flathub.org/assets/badges/flathub-badge-en.png'/></a>
-
-[![Build Flatpak and Upload Artifact](https://github.com/kolunmi/bazaar/actions/workflows/build-flatpak.yml/badge.svg)](https://github.com/kolunmi/bazaar/actions/workflows/build-flatpak.yml)
-
-### Supporting
-
-If you would like to support me and the development of this
-application (Thank you!), I have a ko-fi here! <https://ko-fi.com/kolunmi> 
-
-[![Ko-Fi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/kolunmi)
-
-Thanks to everyone in the GNOME development community for creating
-such an awesome desktop environment!
-
-### Contributing
-
-> [!NOTE]
-> If you are a distributor/packager who would like to learn how to
-customize Bazaar, take a look at the [docs](/docs/overview.org).
-
-If you would like to try this project on your local machine, clone it
-on the cli and type these commands inside the project root:
-
-```sh
+# Build and install
 meson setup build --prefix=/usr/local
 ninja -C build
 sudo ninja -C build install
-bazaar window --auto-service
+
+# Launch GamerX Store
+gamerx-store window --auto-service
 ```
 
-You will need the following dependencies installed, along with a C compiler, meson, and ninja:
-| Dep Name                                                | `pkg-config` Name | Min Version            | Justification                                       |
-|---------------------------------------------------------|-------------------|------------------------|-----------------------------------------------------|
-| [gtk4](https://gitlab.gnome.org/GNOME/gtk/)             | `gtk4`            | enforced by libadwaita | GUI                                                 |
-| [libadwaita](https://gitlab.gnome.org/GNOME/libadwaita) | `libadwaita-1`    | `1.7`                  | GNOME styling                                       |
-| [libdex](https://gitlab.gnome.org/GNOME/libdex)         | `libdex-1`        | `0.11.1`               | Async helpers                                       |
-| [flatpak](https://github.com/flatpak/flatpak)           | `flatpak`         | `1.9`                  | Flatpak installation management                     |
-| [appstream](https://github.com/ximion/appstream)        | `appstream`       | `1.0`                  | Download application metadata                       |
-| [xmlb](https://github.com/hughsie/libxmlb)              | `xmlb`            | `0.3.4`                | Handle binary xml appstream bundles/Parse plain xml |
-| [glycin](https://gitlab.gnome.org/GNOME/glycin)         | `glycin-2`        | `2.0`                  | Retrieve and decode image uris                      |
-| [glycin-gtk4](https://gitlab.gnome.org/GNOME/glycin)    | `glycin-gtk4-2`   | `2.0`                  | Convert glycin frames to `GdkTexture`s              |
-| [libyaml](https://github.com/yaml/libyaml)              | `yaml-0.1`        | `0.2.5`                | Parse YAML configs                                  |
-| [libsoup](https://gitlab.gnome.org/GNOME/libsoup)       | `libsoup-3.0`     | `3.6.0`                | HTTP operations                                     |
-| [json-glib](https://gitlab.gnome.org/GNOME/json-glib)   | `json-glib-1.0`   | `1.10.0`               | Parse HTTP replies from Flathub                     |
+## 👨‍💻 **Developer**
 
+<div align="center">
 
-#### Code of Conduct
+### **Mangesh Choudhary**
+*Lead Developer & Creator of GamerX Linux*
 
-This project adheres to the [GNOME Code of Conduct](https://conduct.gnome.org/). By participating through any means, including PRs, Issues or Discussions, you are expected to uphold this code.
+[![GitHub](https://img.shields.io/badge/GitHub-GamerXECO--sys55-181717?style=for-the-badge&logo=github)](https://github.com/GamerXECO-sys55)
+
+</div>
+
+---
+
+## 🎮 **GamerX Linux Integration**
+
+GamerX Store is specifically designed for **GamerX Linux** - a high-performance gaming distribution:
+- 🎯 **Optimized for Gaming** - Pre-configured for gaming performance
+- 🔧 **Custom Repository** - Access to GamerX-specific packages  
+- 🌟 **Hyprland Integration** - Seamless WM integration
+- 📦 **Dual Sources** - Flathub + GamerX packages
+
+## 🤝 **Contributing**
+
+We welcome contributions! Here's how you can help:
+
+- 🐛 **Bug Reports** - Found an issue? Let us know!
+- 💡 **Feature Requests** - Have ideas? We'd love to hear them!
+- 🔧 **Code Contributions** - Submit PRs for fixes and features
+- 🎨 **UI/UX Design** - Make it even more beautiful
+- 🌍 **Translations** - Help us reach more users
+
+## 🔧 **Dependencies**
+
+| Package | Version | Purpose |
+|---------|---------|---------|
+| **GTK4** | ≥ 4.0 | Modern UI framework |
+| **libadwaita** | ≥ 1.7 | GNOME styling |
+| **libdex** | ≥ 0.11.1 | Async operations |
+| **flatpak** | ≥ 1.9 | Package management |
+| **appstream** | ≥ 1.0 | Application metadata |
+| **libsoup** | ≥ 3.6.0 | HTTP operations |
+
+---
+
+## 📄 **License**
+
+This project is licensed under the **GNU General Public License v3.0**.
+
+```
+Copyright © 2025 Mangesh Choudhary
+GamerX Store - Official Application Store for GamerX Linux
+```
+
+---
+
+## 🙏 **Acknowledgments**
+
+- **GNOME Team** - For GTK4 and libadwaita frameworks
+- **Flatpak Community** - For universal package management
+- **GamerX Linux Community** - For testing and feedback

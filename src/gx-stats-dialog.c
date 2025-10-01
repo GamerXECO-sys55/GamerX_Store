@@ -113,7 +113,7 @@ gx_stats_dialog_class_init (GxStatsDialogClass *klass)
 
   g_type_ensure (GX_TYPE_DATA_GRAPH);
 
-  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/bz-stats-dialog.ui");
+  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/gx-stats-dialog.ui");
   gtk_widget_class_bind_template_child (widget_class, GxStatsDialog, graph);
 }
 

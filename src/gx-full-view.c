@@ -689,7 +689,7 @@ gx_full_view_class_init (GxFullViewClass *klass)
   g_type_ensure (GX_TYPE_SCREENSHOT);
   g_type_ensure (GX_TYPE_SECTION_VIEW);
 
-  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/bz-full-view.ui");
+  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/gx-full-view.ui");
   gtk_widget_class_bind_template_child (widget_class, GxFullView, stack);
   gtk_widget_class_bind_template_child (widget_class, GxFullView, forge_stars);
   gtk_widget_class_bind_template_child (widget_class, GxFullView, forge_stars_label);

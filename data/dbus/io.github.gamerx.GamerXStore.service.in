@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=io.github.gamerx.GamerXStore
+SystemdService=io.github.gamerx.GamerXStore.service
+Exec=@bindir@/gamerx-store service

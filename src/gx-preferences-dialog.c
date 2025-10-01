@@ -137,7 +137,7 @@ gx_preferences_dialog_class_init (GxPreferencesDialogClass *klass)
 
   g_object_class_install_properties (object_class, LAST_PROP, props);
 
-  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/bz-preferences-dialog.ui");
+  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/gx-preferences-dialog.ui");
   
   gtk_widget_class_bind_template_child (widget_class, GxPreferencesDialog, git_forge_star_counts_switch);
   gtk_widget_class_bind_template_child (widget_class, GxPreferencesDialog, search_only_foss_switch);

@@ -81,7 +81,7 @@ gx_update_dialog_class_init (GxUpdateDialogClass *klass)
 
   object_class->dispose = gx_update_dialog_dispose;
 
-  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/bz-update-dialog.ui");
+  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/gx-update-dialog.ui");
   gtk_widget_class_bind_template_child (widget_class, GxUpdateDialog, selection_model);
   gtk_widget_class_bind_template_child (widget_class, GxUpdateDialog, runtime_label);
   gtk_widget_class_bind_template_callback (widget_class, invert_boolean);

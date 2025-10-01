@@ -111,7 +111,7 @@ gx_progress_bar_class_init (GxProgressBarClass *klass)
 
   g_object_class_install_properties (object_class, LAST_PROP, props);
 
-  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/bz-progress-bar.ui");
+  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/gx-progress-bar.ui");
   gtk_widget_class_bind_template_child (widget_class, GxProgressBar, bar);
 }
 

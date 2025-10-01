@@ -150,7 +150,7 @@ gx_entry_inspector_class_init (GxEntryInspectorClass *klass)
 
   g_object_class_install_properties (object_class, LAST_PROP, props);
 
-  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/bz-entry-inspector.ui");
+  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/gx-entry-inspector.ui");
   gtk_widget_class_bind_template_child (widget_class, GxEntryInspector, text_buffer);
   gtk_widget_class_bind_template_child (widget_class, GxEntryInspector, convert_to_json);
   gtk_widget_class_bind_template_callback (widget_class, gen_serialized);

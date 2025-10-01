@@ -1,6 +1,6 @@
-/* bz-application.c
+/* gx-application.c
  *
- * Copyright 2025 Adam Masciola
+ * Copyright 2025 Mangesh Choudhary
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -740,30 +740,11 @@ gx_application_about_action (GSimpleAction *action,
   g_autofree char *translators_string = NULL;
 
   const char *developers[] = {
-    C_ ("About Dialog Developer Credit", "Adam Masciola <kolunmi@posteo.net>"),
+    C_ ("About Dialog Developer Credit", "Mangesh Choudhary"),
     /* This array MUST be NULL terminated */
     NULL
   };
   const char *translators[] = {
-    C_ ("About Dialog Translator Credit", "Ahmed Najmawi"),
-    C_ ("About Dialog Translator Credit", "AtomHare"),
-    C_ ("About Dialog Translator Credit", "Azenyr"),
-    C_ ("About Dialog Translator Credit", "Goudarz Jafari"),
-    C_ ("About Dialog Translator Credit", "Jill Fiore (Lumaeris)"),
-    C_ ("About Dialog Translator Credit", "João Victor (Leal)"),
-    C_ ("About Dialog Translator Credit", "KiKaraage"),
-    C_ ("About Dialog Translator Credit", "Lucosec"),
-    C_ ("About Dialog Translator Credit", "Léane GRASSER"),
-    C_ ("About Dialog Translator Credit", "Marcel Mrówka (Microwave)"),
-    C_ ("About Dialog Translator Credit", "Peter Dave Hello"),
-    C_ ("About Dialog Translator Credit", "Pietro F."),
-    C_ ("About Dialog Translator Credit", "Shihfu Juan"),
-    C_ ("About Dialog Translator Credit", "Shinsei"),
-    C_ ("About Dialog Translator Credit", "Vlastimil Dědek"),
-    C_ ("About Dialog Translator Credit", "asen23"),
-    C_ ("About Dialog Translator Credit", "camegone"),
-    C_ ("About Dialog Translator Credit", "renner"),
-    C_ ("About Dialog Translator Credit", "robotta"),
     /* This array MUST be NULL terminated */
     NULL
   };
@@ -779,14 +760,14 @@ gx_application_about_action (GSimpleAction *action,
       dialog,
       "application-name", "GamerX Store",
       "application-icon", "io.github.gamerx.GamerXStore",
-      "developer-name", _ ("GamerX Linux Team"),
+      "developer-name", _ ("GamerX"),
       "translator-credits", translators_string,
       "version", PACKAGE_VERSION,
       "developers", developers,
-      "copyright", "© 2025 GamerX Linux Team",
+      "copyright", "© 2025 Mangesh Choudhary",
       "license-type", GTK_LICENSE_GPL_3_0,
-      "website", "https://github.com/gamerx-linux/GamerX_Store",
-      "issue-url", "https://github.com/gamerx-linux/GamerX_Store/issues",
+      "website", "https://github.com/GamerXECO-sys55/GamerX_Store",
+      "issue-url", "https://github.com/GamerXECO-sys55/GamerX_Store/issues",
       NULL);
 
   adw_dialog_present (dialog, GTK_WIDGET (window));

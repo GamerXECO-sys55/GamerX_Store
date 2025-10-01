@@ -163,7 +163,7 @@ gx_decorated_screenshot_class_init (GxDecoratedScreenshotClass *klass)
 
   g_type_ensure (GX_TYPE_SCREENSHOT);
 
-  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/bz-decorated-screenshot.ui");
+  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/gx-decorated-screenshot.ui");
   gtk_widget_class_bind_template_child (widget_class, GxDecoratedScreenshot, buttons);
   gtk_widget_class_bind_template_callback (widget_class, open_externally_clicked);
   gtk_widget_class_bind_template_callback (widget_class, copy_clicked);

@@ -225,7 +225,7 @@ gx_share_dialog_class_init (GxShareDialogClass *klass)
 
   g_type_ensure (GX_TYPE_URL);
 
-  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/bz-share-dialog.ui");
+  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/gx-share-dialog.ui");
   gtk_widget_class_bind_template_child (widget_class, GxShareDialog, toast_overlay);
   gtk_widget_class_bind_template_child (widget_class, GxShareDialog, urls_group);
 }

@@ -209,7 +209,7 @@ gx_flathub_page_class_init (GxFlathubPageClass *klass)
   g_type_ensure (GX_TYPE_DYNAMIC_LIST_VIEW);
   g_type_ensure (GX_TYPE_APP_TILE);
 
-  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/bz-flathub-page.ui");
+  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/gx-flathub-page.ui");
   gtk_widget_class_bind_template_child (widget_class, GxFlathubPage, stack);
   gtk_widget_class_bind_template_callback (widget_class, limit_if_false);
   gtk_widget_class_bind_template_callback (widget_class, bind_widget_cb);

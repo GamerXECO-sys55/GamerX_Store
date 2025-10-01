@@ -528,7 +528,7 @@ gx_installed_page_class_init (GxInstalledPageClass *klass)
   g_type_ensure (GX_TYPE_SECTION_VIEW);
   g_type_ensure (GX_TYPE_ENTRY_GROUP);
 
-  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/bz-installed-page.ui");
+  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/gx-installed-page.ui");
   gtk_widget_class_bind_template_child (widget_class, GxInstalledPage, stack);
   gtk_widget_class_bind_template_callback (widget_class, invert_boolean);
   gtk_widget_class_bind_template_callback (widget_class, is_null);

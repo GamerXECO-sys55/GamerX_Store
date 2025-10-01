@@ -149,7 +149,7 @@ gx_inspector_class_init (GxInspectorClass *klass)
 
   g_object_class_install_properties (object_class, LAST_PROP, props);
 
-  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/bz-inspector.ui");
+  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/gx-inspector.ui");
   gtk_widget_class_bind_template_child (widget_class, GxInspector, search_entry);
   gtk_widget_class_bind_template_child (widget_class, GxInspector, filter_model);
   gtk_widget_class_bind_template_callback (widget_class, decache_and_inspect_cb);

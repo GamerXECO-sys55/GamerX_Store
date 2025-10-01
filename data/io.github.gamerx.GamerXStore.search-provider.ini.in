@@ -1,5 +1,5 @@
 [Shell Search Provider]
-DesktopId=io.github.kolunmi.Bazaar.desktop
-BusName=io.github.kolunmi.Bazaar
-ObjectPath=/io/github/kolunmi/Bazaar/SearchProvider
+DesktopId=io.github.gamerx.GamerXStore.desktop
+BusName=io.github.gamerx.GamerXStore
+ObjectPath=/io/github/gamerx/GamerXStore/SearchProvider
 Version=2

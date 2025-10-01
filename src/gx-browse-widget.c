@@ -164,7 +164,7 @@ gx_browse_widget_class_init (GxBrowseWidgetClass *klass)
   g_type_ensure (GX_TYPE_SECTION_VIEW);
   g_type_ensure (GX_TYPE_INHIBITED_SCROLLABLE);
 
-  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/bz-browse-widget.ui");
+  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/gx-browse-widget.ui");
   gtk_widget_class_bind_template_child (widget_class, GxBrowseWidget, stack);
   gtk_widget_class_bind_template_callback (widget_class, group_activated_cb);
 }

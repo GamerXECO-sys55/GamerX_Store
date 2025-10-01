@@ -195,7 +195,7 @@ gx_section_view_class_init (GxSectionViewClass *klass)
   g_type_ensure (GX_TYPE_CURATED_APP_TILE);
   g_type_ensure (GX_TYPE_DYNAMIC_LIST_VIEW);
 
-  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/bz-section-view.ui");
+  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/gx-section-view.ui");
   gtk_widget_class_bind_template_child (widget_class, GxSectionView, banner_text_overlay);
   gtk_widget_class_bind_template_child (widget_class, GxSectionView, banner_text_bg);
   gtk_widget_class_bind_template_child (widget_class, GxSectionView, banner_text);

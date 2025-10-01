@@ -156,7 +156,7 @@ gx_category_page_class_init (GxCategoryPageClass *klass)
 
   g_type_ensure (GX_TYPE_APP_TILE);
 
-  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/bz-category-page.ui");
+  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/gx-category-page.ui");
   gtk_widget_class_bind_template_callback (widget_class, bind_widget_cb);
   gtk_widget_class_bind_template_callback (widget_class, unbind_widget_cb);
 }

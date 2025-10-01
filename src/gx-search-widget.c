@@ -302,7 +302,7 @@ gx_search_widget_class_init (GxSearchWidgetClass *klass)
   g_type_ensure (GX_TYPE_SCREENSHOT);
   g_type_ensure (GX_TYPE_SEARCH_RESULT);
 
-  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/bz-search-widget.ui");
+  gtk_widget_class_set_template_from_resource (widget_class, "/io/github/gamerx/GamerXStore/gx-search-widget.ui");
   gtk_widget_class_bind_template_child (widget_class, GxSearchWidget, search_bar);
   gtk_widget_class_bind_template_child (widget_class, GxSearchWidget, search_text);
   gtk_widget_class_bind_template_child (widget_class, GxSearchWidget, timeout_busy);
