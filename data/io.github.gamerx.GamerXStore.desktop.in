@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=GamerX Store
+Comment=GamerX Linux application store - Install, update and manage Flatpak applications
+Exec=gamerx-store window --auto-service %U
+Icon=io.github.gamerx.GamerXStore
+Terminal=false
+Type=Application
+Categories=Utility;
+Keywords=GTK;System;PackageManager;Discover;Flatpak;Software;Store;GamerX;Linux;Gaming;
+StartupNotify=true
+MimeType=x-scheme-handler/appstream;x-scheme-handler/flatpak;x-scheme-handler/flatpak+https;

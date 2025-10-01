@@ -1,0 +1,177 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $GxSearchWidget: Adw.Bin {
+  styles [
+    "global-search",
+  ]
+
+  ShortcutController {
+    Shortcut {
+      trigger: "<primary>p";
+      action: "action(move)";
+      arguments: "-1";
+    }
+
+    Shortcut {
+      trigger: "<primary>n";
+      action: "action(move)";
+      arguments: "1";
+    }
+
+    Shortcut {
+      trigger: "<primary>k";
+      action: "action(move)";
+      arguments: "-1";
+    }
+
+    Shortcut {
+      trigger: "<primary>j";
+      action: "action(move)";
+      arguments: "1";
+    }
+
+    Shortcut {
+      trigger: "<primary><alt>p";
+      action: "action(move)";
+      arguments: "-10";
+    }
+
+    Shortcut {
+      trigger: "<primary><alt>n";
+      action: "action(move)";
+      arguments: "10";
+    }
+
+    Shortcut {
+      trigger: "<primary><alt>k";
+      action: "action(move)";
+      arguments: "-10";
+    }
+
+    Shortcut {
+      trigger: "<primary><alt>j";
+      action: "action(move)";
+      arguments: "10";
+    }
+  }
+
+  child: Box {
+    orientation: vertical;
+
+    Box {
+      css-name: "search";
+      orientation: horizontal;
+      spacing: 5;
+
+      Text search_bar {
+        hexpand: true;
+        placeholder-text: _("Search Apps");
+      }
+
+      Label search_text {}
+
+      Image timeout_busy {
+        visible: false;
+        icon-name: "delay-symbolic";
+      }
+
+      Image search_busy {
+        visible: false;
+        icon-name: "timer-sand-symbolic";
+      }
+    }
+
+    Revealer entry_list_revealer {
+      transition-type: crossfade;
+
+      child: Box content_box {
+        orientation: horizontal;
+        visible: bind $invert_boolean($is_null(list_view.model as <SingleSelection>.selected-item) as <bool>) as <bool>;
+
+        ScrolledWindow entry_list_scroll {
+          hexpand: true;
+          vexpand: true;
+          hscrollbar-policy: never;
+
+          child: ListView list_view {
+            styles [
+              "navigation-sidebar",
+            ]
+
+            single-click-activate: false;
+            tab-behavior: item;
+
+            factory: BuilderListItemFactory {
+              template ListItem {
+                child: Box {
+                  orientation: horizontal;
+                  margin-top: 8;
+                  margin-bottom: 8;
+                  margin-start: 3;
+                  margin-end: 3;
+                  spacing: 20;
+
+                  Image {
+                    styles [
+                      "icon-dropshadow",
+                    ]
+                    
+                    pixel-size: 32;
+                    paintable: bind template.item as <$GxSearchResult>.group as <$GxEntryGroup>.icon-paintable;
+                  }
+
+                  Box {
+                    hexpand: true;
+                    valign: center;
+                    orientation: vertical;
+                    spacing: 3;
+
+                    Box {
+                      orientation: horizontal;
+                      spacing: 10;
+                    
+                      Label {
+                        styles [
+                          "heading",
+                        ]
+
+                        hexpand: true;
+                        xalign: 0.0;
+                        width-chars: 13;
+                        ellipsize: end;
+                        single-line-mode: true;
+                        label: bind template.item as <$GxSearchResult>.group as <$GxEntryGroup>.title;
+                      }
+
+                      Image {
+                        styles [
+                          "success",
+                        ]
+
+                        icon-name: "app-installed-symbolic";
+                        icon-size: normal;
+                        visible: bind $invert_boolean($is_zero(template.item as <$GxSearchResult>.group as <$GxEntryGroup>.removable) as <bool>) as <bool>;
+                      }
+                    }
+
+                    Label {
+                      styles [
+                        "dim-label",
+                      ]
+
+                      xalign: 0.0;
+                      ellipsize: end;
+                      single-line-mode: true;
+                      label: bind template.item as <$GxSearchResult>.group as <$GxEntryGroup>.description;
+                    }
+                  }
+                };
+              }
+            };
+          };
+        }
+      };
+    }
+  };
+}

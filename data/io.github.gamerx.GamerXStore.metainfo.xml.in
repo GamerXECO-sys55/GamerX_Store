@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.gamerx.GamerXStore</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+
+  <name>GamerX Store</name>
+  <summary>GamerX Linux application store for Flatpak applications</summary>
+  <description>
+    <p>
+      GamerX Store is the official application store for GamerX Linux, providing
+      easy access to thousands of applications from Flathub and custom GamerX
+      repositories.
+    </p>
+    <p>
+      Built on modern GTK4 technology with smooth animations and a beautiful
+      interface, GamerX Store makes it simple to discover, install, and manage
+      applications on your GamerX Linux system.
+    </p>
+  </description>
+
+  <developer id="io.github.gamerx">
+    <name>GamerX Linux Team</name>
+  </developer>
+
+  <url type="homepage">https://github.com/GamerXECO-sys55/GamerX_Store</url>
+  <url type="vcs-browser">https://github.com/GamerXECO-sys55/GamerX_Store</url>
+  <url type="bugtracker">https://github.com/GamerXECO-sys55/GamerX_Store/issues</url>
+  <url type="translate">https://github.com/GamerXECO-sys55/GamerX_Store/tree/master/po</url>
+  <url type="faq">https://github.com/GamerXECO-sys55/GamerX_Store/blob/master/README.md</url>
+  <url type="help">https://github.com/GamerXECO-sys55/GamerX_Store/discussions</url>
+  <url type="donation">https://github.com/GamerXECO-sys55</url>
+  <url type="contact">https://github.com/GamerXECO-sys55</url>
+  <url type="contribute">https://github.com/GamerXECO-sys55/GamerX_Store</url>
+
+  <translation type="gettext">gamerx-store</translation>
+  <launchable type="desktop-id">io.github.gamerx.GamerXStore.desktop</launchable>
+  <content_rating type="oars-1.1" />
+
+  <branding>
+    <color type="primary" scheme_preference="light">#993d3d</color>
+    <color type="primary" scheme_preference="dark">#4f1305</color>
+  </branding>
+
+  <screenshots>
+    <screenshot type="default">
+      <image>https://github.com/user-attachments/assets/3f8b6a63-54df-4978-9cbb-feb461aca9c2</image>
+      <caption>The home view displaying flathub apps and categories</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://github.com/user-attachments/assets/af7e6462-2e59-4368-a10f-03ee96e2074b</image>
+      <caption>Calligraphy application page</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://github.com/user-attachments/assets/a322ad5b-d88c-492a-b0c2-8c36cb161b19</image>
+      <caption>Searching for Blender</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://github.com/user-attachments/assets/a32dff95-5453-499f-b510-6bd2f722cae0"</image>
+      <caption>Download graph for Blender</caption>
+    </screenshot>
+  </screenshots>
+
+  <releases>
+    <release version="0.5.2" date="2025-09-29">
+      <url type="details">https://github.com/kolunmi/bazaar/releases/tag/v0.5.2</url>
+      <description translate="no">
+        <p>This release includes:</p>
+        <ul>
+          <li>553d041 * chore(po): update Ukrainian translation (#408)</li>
+          <li>711732a * Rework Version History (#407)</li>
+          <li>d2d3771 * Calculate detailed app tiles text color based on luminance of background accent color (#405)</li>
+          <li>3787e6e * Save window size in gsettings</li>
+          <li>18ba76c * AsyncTexture: increase HTTP timeout to 5 seconds</li>
+          <li>980f752 * SearchWidget: prevent invalid item selection</li>
+          <li>ab95593 * Add installed icons to app tiles (#404)</li>
+          <li>203754b * (UI) Improve visiblility of add-on feature (#403)</li>
+          <li>069ce61 * fix installed page list outline ring (#402)</li>
+          <li>da9f7b8 * (UX) Refine the Flathub views to be denser and have less partial lines (#401)</li>
+          <li>a6939ba * fix(po): fix Ukrainian translation (#400)</li>
+          <li>35c9611 * decrease app-tile description width reqs</li>
+          <li>6098be7 * chore(po): update Polish translation (#397)</li>
+          <li>2944d1e * change per section limit to 12 from 9 (#396)</li>
+          <li>0b04284 * Update Japanese Translation (#394)</li>
+          <li>fa60f4f * Move to brand new shiny Adw.ShortcutsDialog (#395)</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.5.1" date="2025-09-27">
+      <url type="details">https://github.com/kolunmi/bazaar/releases/tag/v0.5.1</url>
+    </release>
+    <release version="0.5.0" date="2025-09-26">
+      <url type="details">https://github.com/kolunmi/bazaar/releases/tag/v0.5.0</url>
+    </release>
+    <release version="0.4.11" date="2025-09-15">
+      <url type="details">https://github.com/kolunmi/bazaar/releases/tag/v0.4.11</url>
+    </release>
+    <release version="0.4.10" date="2025-09-12">
+      <url type="details">https://github.com/kolunmi/bazaar/releases/tag/v0.4.10</url>
+    </release>
+    <release version="0.4.9" date="2025-09-11">
+      <url type="details">https://github.com/kolunmi/bazaar/releases/tag/v0.4.9</url>
+    </release>
+    <release version="0.4.8" date="2025-09-08">
+      <url type="details">https://github.com/kolunmi/bazaar/releases/tag/v0.4.8</url>
+    </release>
+    <release version="0.4.7" date="2025-09-07">
+      <url type="details">https://github.com/kolunmi/bazaar/releases/tag/v0.4.7</url>
+    </release>
+    <release version="0.4.6" date="2025-09-05">
+      <url type="details">https://github.com/kolunmi/bazaar/releases/tag/v0.4.6</url>
+    </release>
+    <release version="0.4.5" date="2025-09-01">
+      <url type="details">https://github.com/kolunmi/bazaar/releases/tag/v0.4.5</url>
+    </release>
+    <release version="0.4.4" date="2025-08-30">
+      <url type="details">https://github.com/kolunmi/bazaar/releases/tag/v0.4.4</url>
+    </release>
+    <release version="0.4.3" date="2025-08-26">
+      <url type="details">https://github.com/kolunmi/bazaar/releases/tag/v0.4.3</url>
+    </release>
+    <release version="0.4.2" date="2025-08-26">
+      <url type="details">https://github.com/kolunmi/bazaar/releases/tag/v0.4.2</url>
+    </release>
+    <release version="0.4.1" date="2025-08-24">
+      <url type="details">https://github.com/kolunmi/bazaar/releases/tag/v0.4.1</url>
+    </release>
+    <release version="0.4.0" date="2025-08-21">
+      <url type="details">https://github.com/kolunmi/bazaar/releases/tag/v0.4.0</url>
+    </release>
+    <release version="0.3.2" date="2025-08-17">
+      <url type="details">https://github.com/kolunmi/bazaar/releases/tag/v0.3.2</url>
+    </release>
+    <release version="0.3.1" date="2025-08-16">
+      <url type="details">https://github.com/kolunmi/bazaar/releases/tag/v0.3.1</url>
+    </release>
+    <release version="0.3.0" date="2025-08-11">
+      <url type="details">https://github.com/kolunmi/bazaar/releases/tag/v0.3.0</url>
+    </release>
+    <release version="0.2.3" date="2025-07-14">
+      <url type="details">https://github.com/kolunmi/bazaar/releases/tag/v0.2.3</url>
+    </release>
+    <release version="0.2.2" date="2025-07-09">
+      <url type="details">https://github.com/kolunmi/bazaar/releases/tag/v0.2.2</url>
+    </release>
+    <release version="0.2.1" date="2025-07-07">
+      <url type="details">https://github.com/kolunmi/bazaar/releases/tag/v0.2.1</url>
+    </release>
+    <release version="0.2.0" date="2025-07-07">
+      <url type="details">https://github.com/kolunmi/bazaar/releases/tag/v0.2.0</url>
+    </release>
+    <release version="0.1.0" date="2025-06-24">
+      <url type="details">https://github.com/kolunmi/bazaar/releases/tag/v0.1.0</url>
+    </release>
+  </releases>
+</component>

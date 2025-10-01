@@ -1,0 +1,25 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $GxShareDialog: Adw.Dialog {
+  child: Adw.ToastOverlay toast_overlay {
+    child: Adw.ToolbarView {
+      [top]
+      Adw.HeaderBar {
+        title-widget: Label {
+          styles [
+            "heading",
+          ]
+          label: _("Share");
+        };
+      }
+
+      content: Adw.PreferencesGroup urls_group {
+        margin-top: 6;
+        margin-bottom: 18;
+        margin-start: 18;
+        margin-end: 18;
+      };
+    };
+  };
+}

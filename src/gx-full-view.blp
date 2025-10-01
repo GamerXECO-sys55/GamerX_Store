@@ -1,0 +1,489 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $GxFullView: Adw.Bin {
+  child: Adw.ViewStack stack {
+    enable-transitions: true;
+
+    Adw.ViewStackPage {
+      name: "empty";
+      title: _("Empty");
+
+      child: Adw.StatusPage {
+        icon-name: "sad-computer-symbolic";
+        title: _("No Results");
+        description: _("Try a different search query");
+      };
+    }
+
+    Adw.ViewStackPage {
+      name: "content";
+      title: _("Content");
+
+      child: Adw.BreakpointBin breakpoint_bin {
+        width-request: 200;
+        height-request: 200;
+
+        Adw.Breakpoint breakpoint {
+          condition ("max-width: 800px")
+
+          setters {
+            main_box.orientation: vertical;
+            start_box.width-request: -1;
+            main_scroll.vscrollbar-policy: automatic;
+            info_scroll.vscrollbar-policy: never;
+            screenshots.scroll: "false";
+            screenshots.vexpand: "false";
+          }
+        }
+
+        child: ScrolledWindow main_scroll {
+          hscrollbar-policy: never;
+          vscrollbar-policy: never;
+
+          child: Adw.Clamp {
+            maximum-size: 1800;
+            tightening-threshold: 1400;
+
+            child: Box main_box {
+              orientation: horizontal;
+
+              ScrolledWindow info_scroll {
+                vscrollbar-policy: automatic;
+                hscrollbar-policy: never;
+
+                child: Box start_box {
+                  vexpand: false;
+                  margin-start: 15;
+                  margin-end: 15;
+                  margin-top: 15;
+                  margin-bottom: 15;
+                  width-request: 500;
+                  orientation: vertical;
+                  spacing: 20;
+
+                  Box {
+                    orientation: horizontal;
+                    spacing: 20;
+
+                    Image {
+                      valign: center;
+                      halign: center;
+                      pixel-size: 128;
+                      paintable: bind template.entry-group as <$GxEntryGroup>.icon-paintable;
+
+                      styles ["icon-dropshadow"]
+                    }
+
+                    Box {
+                      orientation: vertical;
+                      valign: center;
+                      spacing: 15;
+
+                      Box {
+                        orientation: vertical;
+                        spacing: 3;
+                        
+                        Label {
+                          styles [
+                            "title-1",
+                          ]
+
+                          xalign: 0.0;
+                          wrap: true;
+                          wrap-mode: word_char;
+                          natural-wrap-mode: word;
+                          label: bind template.ui-entry as <$GxResult>.object as <$GxEntry>.title;
+                        }
+
+                        Box {
+                          orientation: horizontal;
+                          spacing: 10;
+                          
+                          Label {
+                            styles [
+                              "accent",
+                            ]
+
+                            xalign: 0.0;
+                            wrap: true;
+                            wrap-mode: word_char;
+                            natural-wrap-mode: word;
+                            label: bind template.ui-entry as <$GxResult>.object as <$GxEntry>.developer;
+                          }
+                          
+                          Revealer {
+                            transition-type: crossfade;
+                            reveal-child: bind template.ui-entry as <$GxResult>.object as <$GxEntry>.verified;
+                            visible: bind template.ui-entry as <$GxResult>.object as <$GxEntry>.verified;
+
+                            child: Image {
+                              styles [
+                                "accent",
+                              ]
+
+                              has-tooltip: true;
+                              tooltip-text: _("This flatpak is verified by the original developers of the software.");
+                              icon-name: "verified-checkmark-symbolic";
+                              icon-size: normal;
+                            };
+                          }
+                        }
+                        Box {
+                          spacing: 8;
+                          Button {
+                            visible: bind $invert_boolean($is_null(template.ui-entry as <$GxResult>.object as <$GxEntry>.donation-url) as <bool>) as <bool>;
+                            styles [
+                              "small-pill",
+                              "suggested-action",
+                              "support"
+                            ]
+                            margin-top:8;
+                            valign: start;
+                            halign: start;
+                            has-tooltip: true;
+                            tooltip-text: bind template.ui-entry as <$GxResult>.object as <$GxEntry>.donation-url;
+                            clicked => $support_cb(template);
+                            child: Adw.ButtonContent {
+                              label: _("Support");
+                              icon-name: "heart-filled-symbolic";
+                            };
+                          }
+                          Revealer forge_stars{
+                            transition-type: slide_down;
+                            reveal-child: false;
+                            child: Button {
+                              styles [
+                                "small-pill",
+                                "suggested-action",
+                                "star"
+                              ]
+
+                              margin-top:8;
+                              valign: start;
+                              halign: start;
+                              has-tooltip: true;
+                              tooltip-text: _("Repository Star Count");
+                              clicked => $forge_cb(template);
+
+                              child: Box {
+                                hexpand: false;
+                                orientation: horizontal;
+                                spacing: 10;
+
+                                Image {
+                                  icon-name: "starred-symbolic";
+                                }
+
+                                Label forge_stars_label {}
+                              };
+                            };
+                          }
+
+                        }
+                      }
+                    }
+                  }
+
+                  Box {
+                    orientation: horizontal;
+                    spacing: 10;
+
+                    Button run_button {
+                      styles [
+                        "pill",
+                      ]
+
+                      has-tooltip: true;
+                      tooltip-text: _("Run Application");
+                      visible: bind $invert_boolean($is_zero(template.entry-group as <$GxEntryGroup>.removable) as <bool>) as <bool>;
+                      sensitive: bind $invert_boolean($is_zero(template.entry-group as <$GxEntryGroup>.removable-and-available) as <bool>) as <bool>;
+                        
+                      icon-name: "media-playback-start-symbolic";
+                      clicked => $run_cb(template);
+                    }
+
+                    Button {
+                      styles [
+                        "suggested-action",
+                        "pill",
+                      ]
+
+                      has-tooltip: true;
+                      tooltip-text: _("Download & Install Application");
+                      visible: bind $logical_and(
+                            $invert_boolean($is_zero(template.entry-group as <$GxEntryGroup>.installable) as <bool>) as <bool>,
+                            $is_zero(template.entry-group as <$GxEntryGroup>.removable) as <bool>
+                      ) as <bool>;
+                      sensitive: bind $invert_boolean($is_zero(template.entry-group as <$GxEntryGroup>.installable-and-available) as <bool>) as <bool>;
+                      label: _("Install");
+                      clicked => $install_cb(template);
+                    }
+
+                    Button remove_button {
+                      styles [
+                        "destructive-action",
+                        "circular",
+                      ]
+
+                      width-request:45;
+                      has-tooltip: true;
+                      tooltip-text: _("Uninstall Application");
+                      visible: bind $invert_boolean($is_zero(template.entry-group as <$GxEntryGroup>.removable) as <bool>) as <bool>;
+                      sensitive: bind $invert_boolean($is_zero(template.entry-group as <$GxEntryGroup>.removable-and-available) as <bool>) as <bool>;
+                        
+                      icon-name: "user-trash-symbolic";
+                      clicked => $remove_cb(template);
+                    }
+
+                    Button addons_btn {
+                      styles [
+                        "circular",
+                      ]
+                      visible:bind $logical_and(
+                            $invert_boolean($is_null(template.entry-group as <$GxEntryGroup>.ui-entry as <$GxResult>.object as <$GxEntry>.addons) as <bool>) as <bool>,
+                            $invert_boolean($is_zero(template.entry-group as <$GxEntryGroup>.removable) as <bool>) as <bool>
+                      ) as <bool>;
+
+                      width-request:45;
+                      has-tooltip: true;
+                      tooltip-text: _("Manage Add-ons");
+                      clicked => $install_addons_cb(template);
+                      icon-name: "puzzle-piece-symbolic";
+                    }
+
+                    Button {
+                      styles [
+                        "circular"
+                      ]
+
+                      width-request:45;
+                      has-tooltip: true;
+                      icon-name: "download-plus-symbolic";
+                      tooltip-text: _("Install Other Version");
+                      visible: bind $logical_and(
+                            $invert_boolean($is_zero(template.entry-group as <$GxEntryGroup>.installable) as <bool>) as <bool>,
+                            $invert_boolean($is_zero(template.entry-group as <$GxEntryGroup>.removable) as <bool>) as <bool>
+                      ) as <bool>;
+                      sensitive: bind $invert_boolean($is_zero(template.entry-group as <$GxEntryGroup>.installable-and-available) as <bool>) as <bool>;
+                      clicked => $install_cb(template);
+                    }
+
+                    Button {
+                      styles [
+                        "circular",
+                        "flat"
+                      ]
+
+                      vexpand: false;
+                      width-request:45;
+                      has-tooltip: true;
+                      tooltip-text: _("Share this application");
+                      icon-name: "share-alt-symbolic";
+                      clicked => $share_cb(template);
+                    }
+                  }
+
+                  Label {
+                      styles [
+                        "title-2",
+                      ]
+                      margin-start: 5;
+                      margin-top: 20;
+                      valign: start;
+                      xalign: 0;
+                      wrap: true;
+                      wrap-mode: word_char;
+                      label: bind template.ui-entry as <$GxResult>.object as <$GxEntry>.description;
+                  }
+
+                  Label {
+                    styles [
+                      "body",
+                    ]
+
+                    margin-start: 5;
+                    margin-end: 10;
+                    margin-top: 0;
+                    margin-bottom: 10;
+                    valign: start;
+                    xalign: 0;
+                    wrap: true;
+                    wrap-mode: word_char;
+                    use-markup: true;
+                    selectable: true;
+                    label: bind template.ui-entry as <$GxResult>.object as <$GxEntry>.long-description;
+                  }
+
+                  Adw.PreferencesGroup {
+                    hexpand: false;
+                    title: _("App Details");
+
+                    Adw.ActionRow {
+                      title: _("Download Size");
+                      subtitle: bind $format_size(template.ui-entry as <$GxResult>.object as <$GxEntry>.size) as <string>;
+
+                      [prefix]
+                      Image {
+                        has-tooltip: true;
+                        tooltip-text: _("Download size");
+                        icon-name: "folder-download-symbolic";
+                      }
+                    }
+
+                    Adw.ActionRow {
+                      title: _("License");
+                      subtitle: bind template.ui-entry as <$GxResult>.object as <$GxEntry>.project-license;
+                      title-selectable: true;
+                      activatable-widget: license_button;
+
+                      [prefix]
+                      Image {
+                        has-tooltip: true;
+                        icon-name: "license-symbolic";
+                        visible: bind template.ui-entry as <$GxResult>.object as <$GxEntry>.is-floss;
+                      }
+
+                      [prefix]
+                      Image {
+                        has-tooltip: true;
+                        icon-name: "dialog-warning-symbolic";
+                        visible: bind $invert_boolean(template.ui-entry as <$GxResult>.object as <$GxEntry>.is-floss) as <bool>;
+                      }
+
+                      [suffix]
+                      MenuButton license_button {
+                        popover: license_info_popover;
+                        icon-name: "dialog-information-symbolic";
+                        valign: center;
+                        styles ["flat"]
+                      }
+                    }
+
+                    Adw.ActionRow {
+                      use-markup: true;
+                      title: _("Project Website");
+                      subtitle: bind template.ui-entry as <$GxResult>.object as <$GxEntry>.url;
+                      activatable: true;
+                      activated => $open_url_cb(template);
+
+                      [prefix]
+                      Image {
+                        has-tooltip: true;
+                        tooltip-text: _("Project Website");
+                        icon-name: "globe-symbolic";
+                      }
+
+                      [suffix]
+                      Image {
+                        margin-end: 8;
+                        has-tooltip: true;
+                        tooltip-text: _("Open in browser");
+                        icon-name: "external-link-symbolic";
+                      }
+                    }
+
+                    Adw.ActionRow {
+                      title: _("Download Statistics");
+                      subtitle: bind $format_recent_downloads(template.debounced-ui-entry as <$GxResult>.object as <$GxEntry>.recent-downloads) as <string>;
+                      sensitive: bind $invert_boolean($is_null(template.debounced-ui-entry) as <bool>) as <bool>;
+                      activatable: true;
+                      activated => $dl_stats_cb(template);
+
+                      [prefix]
+                      Image {
+                        has-tooltip: true;
+                        tooltip-text: _("Download Statistics");
+                        icon-name: "graph-symbolic";
+                      }
+
+                      [suffix]
+                      Image {
+                        margin-end: 8;
+                        has-tooltip: true;
+                        tooltip-text: _("Show Downloads Over Time");
+                        icon-name: "go-next-symbolic";
+                      }
+                    }
+
+                    Adw.ActionRow {
+                      title: _("Repositories");
+                      subtitle: bind template.entry-group as <$GxEntryGroup>.remote-repos-string;
+
+                      [prefix]
+                      Image {
+                        has-tooltip: true;
+                        tooltip-text: _("Remote repo name");
+                        icon-name: "network-server-symbolic";
+                      }
+                    }
+                  }
+
+                  Box {
+                    orientation: vertical;
+
+                    Label {
+                      styles [
+                        "heading", "h4"
+                      ]
+
+                      label: _("Version History");
+                      xalign: 0;
+                      margin-bottom: 12;
+                    }
+
+                    ListBox releases_box {
+                      styles ["boxed-list"]
+
+                      selection-mode: none;
+                    }
+                  }
+                };
+              }
+
+              Box end_box {
+                vexpand: false;
+                hexpand: true;
+                orientation: vertical;
+
+                Adw.Spinner {
+                  vexpand: true;
+                  visible: bind $invert_boolean(template.debounced-ui-entry as <$GxResult>.resolved as <bool>) as <bool>;
+                }
+
+                $GxDynamicListView screenshots {
+                  vexpand: true;
+                  scroll: true;
+                  child-type: "GxDecoratedScreenshot";
+                  child-prop: "async-texture";
+                  visible: bind template.debounced-ui-entry as <$GxResult>.resolved as <bool>;
+                  model: $GxLazyAsyncTextureModel {
+                    model: bind template.debounced-ui-entry as <$GxResult>.object as <$GxEntry>.screenshot-paintables;
+                  };
+                  bind-widget => $screenshots_bind_widget_cb(template);      
+                  unbind-widget => $screenshots_unbind_widget_cb(template);      
+                }
+              }
+            };
+          };
+        };
+      };
+    }
+  };
+}
+
+
+Popover license_info_popover {
+  Label {
+    max-width-chars: 30;
+    justify: center;
+    wrap: true;
+
+    margin-top: 6;
+    margin-bottom: 6;
+    margin-start: 6;
+    margin-end: 6;
+
+   label:bind $pick_license_warning(template.ui-entry as <$GxResult>.object as <$GxEntry>.is-floss) as <string>;
+  }
+}

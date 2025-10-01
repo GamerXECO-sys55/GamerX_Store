@@ -1,0 +1,463 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $GxTransactionView: Adw.Bin {
+  child: Box {
+    styles ["card"]
+
+    Box {
+      margin-top: 10;
+      margin-bottom: 10;
+      margin-start: 10;
+      margin-end: 5;
+      orientation: vertical;
+      spacing: 0;
+      hexpand: true;
+
+      Box {
+        orientation: vertical;
+        spacing: 0;
+
+        ListView {
+          styles [
+            "navigation-sidebar",
+            "transaction-sidebar-entry-list",
+          ]
+                
+          model: NoSelection {
+            model: bind template.transaction as <$GxTransaction>.installs;
+          };
+
+          factory: BuilderListItemFactory {
+            template ListItem {
+              activatable: false;
+
+              child: Box {
+                margin-top: 2;
+                margin-bottom: 2;
+                
+                orientation: horizontal;
+                spacing: 10;
+
+                Overlay {
+                  child: Image {
+                    paintable: bind $get_main_icon(template.item) as <$GdkPaintable>;
+                    pixel-size: 64;
+                    valign: center;
+
+                    styles ["icon-dropshadow"]
+                  };
+
+                  [overlay]
+                  Image {
+                    icon-name: bind $get_sub_icon_name(template.item) as <string>;
+                    pixel-size: 32;
+                    valign: end;
+                    halign: end;
+                  }
+                }
+
+                Box {
+                  valign:center;
+                  orientation: vertical;
+                  spacing:4;
+                  Label {
+                    styles [
+                      "title-2"
+                    ]
+
+                    hexpand: true;
+                    ellipsize: end;
+                    xalign: 0.0;
+                    label: bind template.item as <$GxEntry>.title as <string>;
+                    has-tooltip: true;
+                    tooltip-text: bind template.item as <$GxEntry>.id as <string>;
+                  }
+                  Box {
+                    halign: start;
+                    spacing: 4;
+
+                    styles [
+                      "dimmed",
+                      "small-pill"
+                    ]
+
+                    Image {
+                      icon-name: "drive-harddisk-symbolic";
+                      pixel-size: 16;
+                    }
+
+                    Label {
+                      styles [
+                        "caption-heading"
+                      ]
+                      valign: center;
+                      xalign: 0.0;
+                      label: bind $format_download_size(template.item as <$GxEntry>.size) as <string>;
+                      has-tooltip: true;
+                      tooltip-text: _("Install Size");
+                    }
+                  }
+                }
+
+                Image {
+                  styles [
+                    "success",
+                  ]
+
+                  valign: start;
+                  icon-name: "folder-download-symbolic";
+                  has-tooltip: true;
+                  tooltip-text: _("Install");
+                }
+              };
+            }
+          };
+        }
+        
+        ListView {
+          styles [
+            "navigation-sidebar",
+            "transaction-sidebar-entry-list",
+          ]
+                
+          model: NoSelection {
+            model: bind template.transaction as <$GxTransaction>.updates;
+          };
+
+          factory: BuilderListItemFactory {
+            template ListItem {
+              activatable: false;
+
+              child: Box {
+                margin-top: 2;
+                margin-bottom: 2;
+                
+                orientation: horizontal;
+                spacing: 10;
+
+                Overlay {
+                  child: Image {
+                    paintable: bind $get_main_icon(template.item) as <$GdkPaintable>;
+                    pixel-size: 64;
+                    valign: center;
+
+                    styles ["icon-dropshadow"]
+                  };
+
+                  [overlay]
+                  Image {
+                    icon-name: bind $get_sub_icon_name(template.item) as <string>;
+                    pixel-size: 32;
+                    valign: end;
+                    halign: end;
+                  }
+                }
+                Box {
+                  valign:center;
+                  orientation: vertical;
+                  spacing:4;
+                  Label {
+                    styles [
+                      "title-2"
+                    ]
+
+                    hexpand: true;
+                    ellipsize: end;
+                    xalign: 0.0;
+                    label: bind template.item as <$GxEntry>.title as <string>;
+                    has-tooltip: true;
+                    tooltip-text: bind template.item as <$GxEntry>.id as <string>;
+                  }
+                  Box {
+                    halign: start;
+                    spacing: 4;
+
+                    styles [
+                      "dimmed",
+                      "small-pill"
+                    ]
+
+                    Image {
+                      icon-name: "drive-harddisk-symbolic";
+                      pixel-size: 16;
+                    }
+
+                    Label {
+                      styles [
+                        "caption-heading"
+                      ]
+                      valign: center;
+                      xalign: 0.0;
+                      label: bind $format_download_size(template.item as <$GxEntry>.size) as <string>;
+                      has-tooltip: true;
+                      tooltip-text: _("Updated Size");
+                    }
+                  }
+                }
+
+                Image {
+                  styles [
+                    "accent",
+                  ]
+                  
+                  valign: start;
+                  icon-name: "software-update-available-symbolic";
+                  has-tooltip: true;
+                  tooltip-text: _("Update");
+                }
+              };
+            }
+          };
+        }
+
+        ListView {
+          styles [
+            "navigation-sidebar",
+            "transaction-sidebar-entry-list",
+          ]
+                
+          model: NoSelection {
+            model: bind template.transaction as <$GxTransaction>.removals;
+          };
+
+          factory: BuilderListItemFactory {
+            template ListItem {
+              activatable: false;
+
+              child: Box {
+                margin-top: 2;
+                margin-bottom: 2;
+                
+                orientation: horizontal;
+                spacing: 10;
+
+                Overlay {
+                  child: Image {
+                    paintable: bind $get_main_icon(template.item) as <$GdkPaintable>;
+                    pixel-size: 64;
+                    valign: center;
+
+                    styles ["icon-dropshadow"]
+                  };
+
+                  [overlay]
+                  Image {
+                    icon-name: bind $get_sub_icon_name(template.item) as <string>;
+                    pixel-size: 32;
+                    valign: end;
+                    halign: end;
+                  }
+                }
+                Box {
+                  valign:center;
+                  orientation: vertical;
+                  spacing:4;
+                  Label {
+                    styles [
+                      "title-2"
+                    ]
+
+                    hexpand: true;
+                    ellipsize: end;
+                    xalign: 0.0;
+                    label: bind template.item as <$GxEntry>.title as <string>;
+                    has-tooltip: true;
+                    tooltip-text: bind template.item as <$GxEntry>.id as <string>;
+                  }
+                  Box {
+                    halign: start;
+                    spacing: 4;
+
+                    styles [
+                      "small-pill",
+                      "error"
+                    ]
+
+                    Image {
+                      icon-name: "drive-harddisk-symbolic";
+                      pixel-size: 16;
+                    }
+
+                    Label {
+                      styles [
+                        "caption-heading"
+                      ]
+                      valign: center;
+                      xalign: 0.0;
+                      label: bind $format_download_size(template.item as <$GxEntry>.size) as <string>;
+                      has-tooltip: true;
+                      tooltip-text: _("Freed Space");
+                    }
+                  }
+                }
+
+                Image {
+                  styles [
+                    "error",
+                  ]
+                  
+                  valign: start;
+                  icon-name: "user-trash-symbolic";
+                  has-tooltip: true;
+                  tooltip-text: _("Remove");
+                }
+              };
+            }
+          };
+        }
+      }
+
+      ListView {
+        styles [
+          "navigation-sidebar",
+          "transaction-sidebar-entry-list",
+        ]
+        
+        model: NoSelection {
+          model: bind template.transaction as <$GxTransaction>.current-ops;
+        };
+
+        factory: BuilderListItemFactory {
+          template ListItem {
+            activatable: false;
+
+            child: Box {
+              margin-start: 5;
+              margin-end: 5;
+              margin-top: 5;
+              margin-bottom: 15;
+                
+              orientation: vertical;
+              spacing: 7;
+
+              Label {
+                styles [
+                  "dimmed",
+                  "caption-heading"
+                ]
+
+                hexpand: true;
+                xalign: 1;
+                ellipsize: end;
+                single-line-mode: true;
+                label: bind template.item as <$GxTransactionTask>.last-progress as <$GxBackendTransactionOpProgressPayload>.status;
+              }
+              
+              $GxProgressBar {
+                hexpand: "true";
+                fraction: bind template.item as <$GxTransactionTask>.last-progress as <$GxBackendTransactionOpProgressPayload>.progress;
+              }
+            };
+          }
+        };
+      }
+      
+      ListView {
+        visible: true;
+
+        styles [
+          "navigation-sidebar",
+          "transaction-sidebar-entry-list",
+        ]
+
+        model: NoSelection {
+          model: bind template.transaction as <$GxTransaction>.finished-ops;
+        };
+
+        factory: BuilderListItemFactory {
+          template ListItem {
+            activatable: false;
+
+            child: Box {
+              orientation: horizontal;
+              spacing: 10;
+
+              Image {
+                styles [
+                  "success",
+                ]
+                valign: center;
+                icon-name: "check-plain-symbolic";
+                visible: bind $is_null(template.item as <$GxTransactionTask>.error) as <bool>;
+              }
+                
+              Image {
+                styles [
+                  "error",
+                ]
+                valign: center;
+                icon-name: "cross-large-circle-filled-symbolic";
+                visible: bind $invert_boolean($is_null(template.item as <$GxTransactionTask>.error) as <bool>) as <bool>;
+              }
+
+              Box {
+                valign: center;
+                orientation: horizontal;
+                spacing: 5;
+                hexpand: true;
+                
+                Label {
+                  styles [
+                    "dimmed",
+                  ]
+
+                  valign: center;
+                  hexpand: true;
+                  xalign: 0.0;
+                  ellipsize: end;
+                  single-line-mode: true;
+                  label: bind template.item as <$GxTransactionTask>.op as <$GxBackendTransactionOpPayload>.name;
+                  visible: bind $is_null(template.item as <$GxTransactionTask>.error) as <bool>;
+                }
+
+                Label {
+                  styles [
+                    "error",
+                  ]
+
+                  valign: center;
+                  hexpand: true;
+                  xalign: 0.0;
+                  ellipsize: end;
+                  single-line-mode: true;
+                  label: bind template.item as <$GxTransactionTask>.op as <$GxBackendTransactionOpPayload>.name;
+                  visible: bind $invert_boolean($is_null(template.item as <$GxTransactionTask>.error) as <bool>) as <bool>;
+                }
+
+                MenuButton {
+                  styles [
+                    "circular",
+                    "flat",
+                    "error"
+                  ]
+                  icon-name: "dialog-information-symbolic";
+                  visible: bind $invert_boolean($is_null(template.item as <$GxTransactionTask>.error) as <bool>) as <bool>;
+                  has-tooltip: true;
+                  tooltip-text: _("Error Details");
+                  
+                  popover: Popover {
+                    child: Label {
+                      margin-start: 15;
+                      margin-end: 15;
+                      margin-top: 15;
+                      margin-bottom: 15;
+                    
+                      xalign: 0.0;
+                      max-width-chars: 35;
+                      wrap: true;
+                      wrap-mode: word_char;
+                      selectable: true;
+                  
+                      label: bind template.item as <$GxTransactionTask>.error;
+                    };
+                  };
+                }
+              }
+            };
+          }
+        };
+      }
+    }
+  };
+}

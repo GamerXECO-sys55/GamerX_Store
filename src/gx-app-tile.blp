@@ -1,0 +1,100 @@
+using Gtk 4.0;
+
+template $GxAppTile: Button {
+  styles [
+    "card",
+    "app-tile",
+  ]
+
+  margin-start: 5;
+  margin-end: 5;
+  margin-top: 5;
+  margin-bottom: 5;
+  child: Overlay {
+    [overlay]
+    Image {
+      halign: end;
+      valign: start;
+      styles [
+        "success",
+      ]
+      icon-name: "app-installed-symbolic";
+      icon-size: normal;
+      visible: bind $invert_boolean($is_zero(template.group as <$GxEntryGroup>.removable) as <bool>) as <bool>;
+      margin-top: 10;
+      margin-end: 10;
+    }
+
+    Box {
+      margin-start: 12;
+      margin-end: 12;
+      margin-top: 12;
+      margin-bottom: 12;
+      orientation: horizontal;
+      spacing: 15;
+      can-focus: false;
+
+      Image {
+        pixel-size: 64;
+        paintable: bind template.group as <$GxEntryGroup>.icon-paintable;
+
+        styles ["icon-dropshadow"]
+      }
+
+      Box {
+        valign: center;
+        hexpand: true;
+        orientation: vertical;
+        spacing: 5;
+
+        Box {
+          orientation: horizontal;
+          spacing: 10;
+
+          Label {
+            css-name: "app-tile-title";
+            styles [
+              "heading",
+            ]
+
+            xalign: 0.0;
+            ellipsize: end;
+            label: bind template.group as <$GxEntryGroup>.title;
+            max-width-chars: 18;
+          }
+
+          Revealer {
+            transition-type: crossfade;
+            reveal-child: bind template.group as <$GxEntryGroup>.ui-entry as <$GxResult>.object as <$GxEntry>.verified;
+            visible: bind template.group as <$GxEntryGroup>.ui-entry as <$GxResult>.object as <$GxEntry>.verified;
+
+            child: Image {
+              css-name: "app-tile-verified-check";
+              styles [
+                "accent",
+              ]
+
+              has-tooltip: true;
+              tooltip-text: _("This flatpak is verified by the original developers of the software.");
+              icon-name: "verified-checkmark-symbolic";
+              icon-size: normal;
+            };
+          }
+        }
+
+        Label {
+          css-name: "app-tile-description";
+          xalign: 0.0;
+          yalign: 0.0;
+          wrap: true;
+          ellipsize: end;
+          vexpand: true;
+          lines: 2;
+          max-width-chars: 15;
+          single-line-mode: true;
+          label: bind template.group as <$GxEntryGroup>.description;
+        }
+      }
+    }
+  };
+}

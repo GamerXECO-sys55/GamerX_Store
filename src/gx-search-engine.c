@@ -1,0 +1,595 @@
+/* bz-search-engine.c
+ *
+ * Copyright 2025 Adam Masciola
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+#include "gx-search-engine.h"
+#include "gx-entry-group.h"
+#include "gx-env.h"
+#include "gx-search-result.h"
+#include "gx-util.h"
+
+struct _GxSearchEngine
+{
+  GObject parent_instance;
+
+  GListModel *model;
+  GPtrArray  *mirror;
+};
+
+G_DEFINE_FINAL_TYPE (GxSearchEngine, gx_search_engine, G_TYPE_OBJECT);
+
+enum
+{
+  PROP_0,
+
+  PROP_MODEL,
+
+  LAST_PROP
+};
+static GParamSpec *props[LAST_PROP] = { 0 };
+
+static void
+items_changed (GxSearchEngine *self,
+               guint           position,
+               guint           removed,
+               guint           added,
+               GListModel     *model);
+
+GX_DEFINE_DATA (
+    query_task,
+    QueryTask,
+    {
+      char     **terms;
+      GPtrArray *shallow_mirror;
+    },
+    GX_RELEASE_DATA (terms, g_strfreev);
+    GX_RELEASE_DATA (shallow_mirror, g_ptr_array_unref))
+static DexFuture *
+query_task_fiber (QueryTaskData *data);
+
+typedef struct
+{
+  gunichar     ch;
+  GUnicodeType type;
+} IndexedChar;
+
+GX_DEFINE_DATA (
+    indexed_string,
+    IndexedString,
+    {
+      char        *ptr;
+      glong        utf8_len;
+      IndexedChar *chars;
+    },
+    GX_RELEASE_DATA (ptr, g_free);
+    GX_RELEASE_DATA (chars, g_free))
+
+static inline void
+index_string (const char        *s,
+              IndexedStringData *out);
+
+static inline double
+test_strings (IndexedStringData *query,
+              IndexedStringData *against);
+
+GX_DEFINE_DATA (
+    group,
+    Group,
+    {
+      GxEntryGroup   *group;
+      GArray         *istrings;
+      GxSearchResult *default_result;
+    },
+    GX_RELEASE_DATA (group, g_object_unref);
+    GX_RELEASE_DATA (istrings, g_array_unref);
+    GX_RELEASE_DATA (default_result, g_object_unref))
+
+typedef struct
+{
+  guint  idx;
+  double val;
+} Score;
+
+static gint
+cmp_scores (Score *a,
+            Score *b);
+
+#define PERFECT        1.0
+#define ALMOST_PERFECT 0.95
+#define SAME_CLASS     0.2
+#define SAME_CLUSTER   0.1
+#define NO_MATCH       0.0
+
+static void
+gx_search_engine_dispose (GObject *object)
+{
+  GxSearchEngine *self = GX_SEARCH_ENGINE (object);
+
+  if (self->model != NULL)
+    g_signal_handlers_disconnect_by_func (self->model, items_changed, self);
+  g_clear_object (&self->model);
+
+  g_clear_pointer (&self->mirror, g_ptr_array_unref);
+
+  G_OBJECT_CLASS (gx_search_engine_parent_class)->dispose (object);
+}
+
+static void
+gx_search_engine_get_property (GObject    *object,
+                               guint       prop_id,
+                               GValue     *value,
+                               GParamSpec *pspec)
+{
+  GxSearchEngine *self = GX_SEARCH_ENGINE (object);
+
+  switch (prop_id)
+    {
+    case PROP_MODEL:
+      g_value_set_object (value, gx_search_engine_get_model (self));
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
+gx_search_engine_set_property (GObject      *object,
+                               guint         prop_id,
+                               const GValue *value,
+                               GParamSpec   *pspec)
+{
+  GxSearchEngine *self = GX_SEARCH_ENGINE (object);
+
+  switch (prop_id)
+    {
+    case PROP_MODEL:
+      gx_search_engine_set_model (self, g_value_get_object (value));
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
+gx_search_engine_class_init (GxSearchEngineClass *klass)
+{
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->set_property = gx_search_engine_set_property;
+  object_class->get_property = gx_search_engine_get_property;
+  object_class->dispose      = gx_search_engine_dispose;
+
+  props[PROP_MODEL] =
+      g_param_spec_object (
+          "model",
+          NULL, NULL,
+          G_TYPE_LIST_MODEL,
+          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_EXPLICIT_NOTIFY);
+
+  g_object_class_install_properties (object_class, LAST_PROP, props);
+}
+
+static void
+gx_search_engine_init (GxSearchEngine *self)
+{
+  self->mirror = g_ptr_array_new_with_free_func (group_data_unref);
+}
+
+GxSearchEngine *
+gx_search_engine_new (void)
+{
+  return g_object_new (GX_TYPE_SEARCH_ENGINE, NULL);
+}
+
+GListModel *
+gx_search_engine_get_model (GxSearchEngine *self)
+{
+  g_return_val_if_fail (GX_IS_SEARCH_ENGINE (self), NULL);
+  return self->model;
+}
+
+void
+gx_search_engine_set_model (GxSearchEngine *self,
+                            GListModel     *model)
+{
+  g_return_if_fail (GX_IS_SEARCH_ENGINE (self));
+  g_return_if_fail (model == NULL || G_IS_LIST_MODEL (model));
+
+  if (self->model != NULL)
+    g_signal_handlers_disconnect_by_func (self->model, items_changed, self);
+  g_clear_object (&self->model);
+
+  if (self->mirror->len > 0)
+    g_ptr_array_remove_range (self->mirror, 0, self->mirror->len);
+
+  if (model != NULL)
+    {
+      self->model = g_object_ref (model);
+      items_changed (self, 0, 0, g_list_model_get_n_items (model), model);
+      g_signal_connect_swapped (model, "items-changed", G_CALLBACK (items_changed), self);
+    }
+
+  g_object_notify_by_pspec (G_OBJECT (self), props[PROP_MODEL]);
+}
+
+DexFuture *
+gx_search_engine_query (GxSearchEngine    *self,
+                        const char *const *terms)
+{
+
+  g_return_val_if_fail (GX_IS_SEARCH_ENGINE (self), NULL);
+  g_return_val_if_fail (terms != NULL && *terms != NULL, NULL);
+
+  if (self->mirror->len == 0 || **terms == '\0')
+    {
+      g_autoptr (GPtrArray) ret = NULL;
+
+      ret = g_ptr_array_new_with_free_func (g_object_unref);
+      g_ptr_array_set_size (ret, self->mirror->len);
+
+      for (guint i = 0; i < ret->len; i++)
+        {
+          GroupData *data = NULL;
+
+          data = g_ptr_array_index (self->mirror, i);
+          /* Set original index here to ensure it is always up to date */
+          gx_search_result_set_original_index (data->default_result, i);
+          g_ptr_array_index (ret, i) = g_object_ref (data->default_result);
+        }
+
+      return dex_future_new_take_boxed (
+          G_TYPE_PTR_ARRAY,
+          g_steal_pointer (&ret));
+    }
+  else
+    {
+      g_autoptr (GPtrArray) shallow_mirror = NULL;
+      g_autoptr (QueryTaskData) data       = NULL;
+
+      shallow_mirror = g_ptr_array_new_with_free_func (group_data_unref);
+      g_ptr_array_set_size (shallow_mirror, self->mirror->len);
+
+      for (guint i = 0; i < shallow_mirror->len; i++)
+        g_ptr_array_index (shallow_mirror, i) =
+            group_data_ref (g_ptr_array_index (self->mirror, i));
+
+      data                 = query_task_data_new ();
+      data->terms          = g_strdupv ((gchar **) terms);
+      data->shallow_mirror = g_steal_pointer (&shallow_mirror);
+
+      return dex_scheduler_spawn (
+          dex_thread_pool_scheduler_get_default (),
+          gx_get_dex_stack_size (),
+          (DexFiberFunc) query_task_fiber,
+          query_task_data_ref (data), query_task_data_unref);
+    }
+}
+
+static void
+items_changed (GxSearchEngine *self,
+               guint           position,
+               guint           removed,
+               guint           added,
+               GListModel     *model)
+{
+  if (removed > 0)
+    g_ptr_array_remove_range (self->mirror, position, removed);
+
+  for (guint i = 0; i < added; i++)
+    {
+      g_autoptr (GxEntryGroup) group = NULL;
+      const char *id                 = NULL;
+      const char *title              = NULL;
+      const char *developer          = NULL;
+      const char *description        = NULL;
+      GPtrArray  *search_tokens      = NULL;
+      g_autoptr (GroupData) data     = NULL;
+
+      group         = g_list_model_get_item (model, position + i);
+      id            = gx_entry_group_get_id (group);
+      title         = gx_entry_group_get_title (group);
+      developer     = gx_entry_group_get_developer (group);
+      description   = gx_entry_group_get_description (group);
+      search_tokens = gx_entry_group_get_search_tokens (group);
+
+      data        = group_data_new ();
+      data->group = g_object_ref (group);
+
+      data->istrings = g_array_new (FALSE, TRUE, sizeof (IndexedStringData));
+      g_array_set_clear_func (data->istrings, indexed_string_data_deinit);
+
+#define ADD_INDEXED_STRING(_s)                     \
+  if ((_s) != NULL)                                \
+    {                                              \
+      IndexedStringData append = { 0 };            \
+                                                   \
+      index_string ((_s), &append);                \
+      g_array_append_val (data->istrings, append); \
+    }
+
+      ADD_INDEXED_STRING (id);
+      ADD_INDEXED_STRING (title);
+      ADD_INDEXED_STRING (developer);
+      ADD_INDEXED_STRING (description);
+
+#undef ADD_INDEXED_STRING
+
+      if (search_tokens != NULL)
+        {
+          guint old_len = 0;
+
+          old_len = data->istrings->len;
+          g_array_set_size (data->istrings, old_len + search_tokens->len);
+
+          for (guint j = 0; j < search_tokens->len; j++)
+            {
+              const char        *token   = NULL;
+              IndexedStringData *istring = NULL;
+
+              token   = g_ptr_array_index (search_tokens, j);
+              istring = &g_array_index (data->istrings, IndexedStringData, old_len + j);
+
+              index_string (token, istring);
+            }
+        }
+
+      data->default_result = gx_search_result_new ();
+      gx_search_result_set_group (data->default_result, group);
+
+      g_ptr_array_insert (self->mirror, position + i, g_steal_pointer (&data));
+    }
+}
+
+static DexFuture *
+query_task_fiber (QueryTaskData *data)
+{
+  char     **terms                 = data->terms;
+  GPtrArray *shallow_mirror        = data->shallow_mirror;
+  g_autoptr (GArray) term_istrings = NULL;
+  g_autoptr (GArray) scores        = NULL;
+  g_autoptr (GPtrArray) results    = NULL;
+
+  term_istrings = g_array_new (FALSE, TRUE, sizeof (IndexedStringData));
+  g_array_set_clear_func (term_istrings, indexed_string_data_deinit);
+  g_array_set_size (term_istrings, g_strv_length (terms));
+  for (guint i = 0; terms[i] != NULL; i++)
+    {
+      IndexedStringData *istring = NULL;
+
+      istring = &g_array_index (term_istrings, IndexedStringData, i);
+      index_string (terms[i], istring);
+    }
+
+  scores = g_array_new (FALSE, FALSE, sizeof (Score));
+
+  for (guint i = 0; i < shallow_mirror->len; i++)
+    {
+      GroupData *group_data = NULL;
+      double     score      = 0.0;
+
+      group_data = g_ptr_array_index (shallow_mirror, i);
+      for (guint j = 0; j < group_data->istrings->len; j++)
+        {
+          IndexedStringData *token_istring = NULL;
+          double             token_score   = 1.0;
+
+          token_istring = &g_array_index (group_data->istrings, IndexedStringData, j);
+          for (guint k = 0; k < term_istrings->len; k++)
+            {
+              IndexedStringData *term_istring = NULL;
+              double             mult         = 0.0;
+
+              term_istring = &g_array_index (term_istrings, IndexedStringData, k);
+
+              mult = test_strings (term_istring, token_istring);
+              /* highly reward multiple terms hitting the same token */
+              token_score *= mult;
+            }
+
+          /* correct for the decay of multiple terms */
+          token_score *= (double) term_istrings->len;
+          /* earliest tokens are the most important */
+          token_score *= 16.0 / (double) (j + 1);
+          score += token_score;
+        }
+
+      if (score > (double) term_istrings->len)
+        {
+          Score append = { 0 };
+
+          append.idx = i;
+          append.val = score;
+          g_array_append_val (scores, append);
+        }
+    }
+
+  if (scores->len > 0)
+    g_array_sort (scores, (GCompareFunc) cmp_scores);
+
+  results = g_ptr_array_new_with_free_func (g_object_unref);
+  g_ptr_array_set_size (results, scores->len);
+  for (guint i = 0; i < scores->len; i++)
+    {
+      Score     *score                  = NULL;
+      GroupData *group_data             = NULL;
+      g_autoptr (GxSearchResult) result = NULL;
+
+      score      = &g_array_index (scores, Score, i);
+      group_data = g_ptr_array_index (shallow_mirror, score->idx);
+
+      result = gx_search_result_new ();
+      gx_search_result_set_group (result, group_data->group);
+      gx_search_result_set_original_index (result, score->idx);
+      gx_search_result_set_score (result, score->val);
+
+      g_ptr_array_index (results, i) = g_steal_pointer (&result);
+    }
+
+  return dex_future_new_take_boxed (
+      G_TYPE_PTR_ARRAY,
+      g_steal_pointer (&results));
+}
+
+static inline void
+index_string (const char        *s,
+              IndexedStringData *out)
+{
+  g_autofree char *normalized = NULL;
+  g_autofree char *casefolded = NULL;
+  guint            i          = 0;
+
+  normalized = g_utf8_normalize (s, -1, G_NORMALIZE_ALL);
+  casefolded = g_utf8_casefold (normalized, -1);
+
+  out->ptr      = g_steal_pointer (&casefolded);
+  out->utf8_len = g_utf8_strlen (out->ptr, -1);
+  out->chars    = g_malloc0_n (out->utf8_len, sizeof (*out->chars));
+
+  for (char *ch = out->ptr; *ch != '\0'; ch = g_utf8_next_char (ch), i++)
+    {
+      out->chars[i].ch   = g_utf8_get_char (ch);
+      out->chars[i].type = g_unichar_type (out->chars[i].ch);
+    }
+}
+
+static inline double
+test_chars (IndexedChar *a,
+            IndexedChar *b)
+{
+  if (a->ch == b->ch)
+    return PERFECT;
+
+  // if ((a->type == G_UNICODE_LOWERCASE_LETTER ||
+  //      a->type == G_UNICODE_MODIFIER_LETTER ||
+  //      a->type == G_UNICODE_OTHER_LETTER ||
+  //      a->type == G_UNICODE_TITLECASE_LETTER ||
+  //      a->type == G_UNICODE_LOWERCASE_LETTER) &&
+
+  //     (b->type == G_UNICODE_LOWERCASE_LETTER ||
+  //      b->type == G_UNICODE_MODIFIER_LETTER ||
+  //      b->type == G_UNICODE_OTHER_LETTER ||
+  //      b->type == G_UNICODE_TITLECASE_LETTER ||
+  //      b->type == G_UNICODE_LOWERCASE_LETTER))
+  //   return SAME_CLUSTER;
+
+  // if ((a->type == G_UNICODE_DECIMAL_NUMBER ||
+  //      a->type == G_UNICODE_LETTER_NUMBER ||
+  //      a->type == G_UNICODE_OTHER_NUMBER) &&
+
+  //     (b->type == G_UNICODE_DECIMAL_NUMBER ||
+  //      b->type == G_UNICODE_LETTER_NUMBER ||
+  //      b->type == G_UNICODE_OTHER_NUMBER))
+  //   return SAME_CLUSTER;
+
+  // if ((a->type == G_UNICODE_CONNECT_PUNCTUATION ||
+  //      a->type == G_UNICODE_DASH_PUNCTUATION ||
+  //      a->type == G_UNICODE_CLOSE_PUNCTUATION ||
+  //      a->type == G_UNICODE_FINAL_PUNCTUATION ||
+  //      a->type == G_UNICODE_INITIAL_PUNCTUATION ||
+  //      a->type == G_UNICODE_OTHER_PUNCTUATION ||
+  //      a->type == G_UNICODE_OPEN_PUNCTUATION) &&
+
+  //     (b->type == G_UNICODE_CONNECT_PUNCTUATION ||
+  //      b->type == G_UNICODE_DASH_PUNCTUATION ||
+  //      b->type == G_UNICODE_CLOSE_PUNCTUATION ||
+  //      b->type == G_UNICODE_FINAL_PUNCTUATION ||
+  //      b->type == G_UNICODE_INITIAL_PUNCTUATION ||
+  //      b->type == G_UNICODE_OTHER_PUNCTUATION ||
+  //      b->type == G_UNICODE_OPEN_PUNCTUATION))
+  //   return SAME_CLUSTER;
+
+  return NO_MATCH;
+}
+
+static inline double
+test_strings (IndexedStringData *query,
+              IndexedStringData *against)
+{
+  guint  last_best_idx = G_MAXUINT;
+  guint  misses        = 0;
+  double score         = 0.0;
+  int    length_diff   = 0;
+
+  /* Quick check of exact match before doing complex stuff */
+  if (g_strstr_len (against->ptr, -1, query->ptr))
+    return ((double) query->utf8_len / (double) against->utf8_len) * (double) query->utf8_len;
+
+  for (guint i = 0; i < query->utf8_len; i++)
+    {
+      guint  best_idx   = G_MAXUINT;
+      double best_score = 0.0;
+
+      for (guint j = against->utf8_len; j > 1; j--)
+        {
+          double tmp_score = 0;
+
+          tmp_score = test_chars (&query->chars[i], &against->chars[j - 1]);
+          if (tmp_score > NO_MATCH &&
+              (tmp_score > best_score ||
+               ((last_best_idx == G_MAXUINT ||
+                 j - 1 > last_best_idx) &&
+                tmp_score >= best_score)))
+            {
+              best_idx   = j - 1;
+              best_score = tmp_score;
+            }
+        }
+
+      if (best_idx != G_MAXUINT)
+        {
+          if (last_best_idx != G_MAXUINT)
+            {
+              int diff = 0;
+
+              diff = (int) best_idx - (int) last_best_idx;
+              if (diff > 1)
+                /* Penalize the query for fragmentation */
+                best_score /= (double) diff;
+              else if (diff < 0)
+                /* Penalize the query more harshly for
+                 * transposing and fragmentation
+                 */
+                best_score /= 1.5 * (double) ABS (diff);
+            }
+
+          score += best_score;
+          last_best_idx = best_idx;
+        }
+      else
+        misses++;
+    }
+
+  /* Penalize the query for including chars that didn't match at all */
+  score /= (double) (misses + 1);
+
+  length_diff = ABS ((int) against->utf8_len - (int) query->utf8_len);
+  /* Penalize the query for being a different length */
+  score /= (double) (length_diff + 1);
+
+  return score;
+}
+
+static gint
+cmp_scores (Score *a,
+            Score *b)
+{
+  return (b->val - a->val < 0.0) ? -1 : 1;
+}
+
+/* End of bz-search-engine.c */

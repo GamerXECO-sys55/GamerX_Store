@@ -1,0 +1,57 @@
+# Build directories
+build/
+_build/
+
+# Subprojects (downloaded dependencies)
+subprojects/*/
+
+# Keep subproject wrap files
+!subprojects/*.wrap
+
+# Compiled binaries
+*.o
+*.so
+*.a
+*.exe
+gamerx-store
+
+# IDE/Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.cproject
+.settings/
+
+# System files
+.DS_Store
+Thumbs.db
+*.tmp
+
+# Rust build artifacts (in gamerx-store-ui)
+gamerx-store-ui/target/
+gamerx-store-ui/Cargo.lock
+
+# Translation build files
+po/*.mo
+po/POTFILES
+
+# Generated files
+*.gresource
+*-resources.c
+*-resources.h
+*-marshalers.c
+*-marshalers.h
+
+# Local configuration
+local.conf
+*.local
+
+# Logs
+*.log
+
+# Backup files
+*.bak
+*.orig
